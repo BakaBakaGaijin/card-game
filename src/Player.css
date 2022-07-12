@@ -1,0 +1,73 @@
+.player {
+  padding: 10px;
+  flex-grow: 2;
+}
+
+.player-header2 {
+  flex-direction: row-reverse;
+}
+
+.player-header-lives {
+  display: flex;
+  align-items: center;
+  font-size: 40px;
+}
+
+.player-header-lives__mul {
+  width: 30px;
+}
+
+.player-header-lives__heart1 {
+  fill: deeppink;
+}
+
+.player-header-lives__heart2 {
+  fill: deepskyblue;
+}
+
+.player-header__title1 {
+  color: deeppink;
+}
+
+.player-header__title2 {
+  color: deepskyblue;
+}
+
+.cardStack {
+  box-sizing: border-box;
+  width: 100px;
+  height: 200px;
+  border: 2px solid #000;
+  border-radius: 10px;
+  position: relative;
+}
+
+.cardStack1 {
+  background-color: deeppink;
+}
+
+.cardStack2 {
+  background-color: deepskyblue;
+}
+
+.cardStack__item {
+  box-sizing: border-box;
+  width: 100px;
+  height: 200px;
+  border: 2px solid #000;
+  border-radius: 10px;
+  position: relative;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.cardStack__item1 {
+  background-color: deeppink;
+}
+
+.cardStack__item2 {
+  background-color: deepskyblue;
+  left: 10px;
+}
