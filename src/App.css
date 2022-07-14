@@ -54,9 +54,16 @@
 .modal {
   box-sizing: border-box;
   border-radius: 10px;
-  width: 100px;
-  height: 100px;
   background-color: #fff;
+  padding: 10px;
+}
+
+.modal-winner1 {
+  color: deeppink;
+}
+
+.modal-winner2 {
+  color: deepskyblue;
 }
 
 .game {

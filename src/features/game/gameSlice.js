@@ -43,6 +43,8 @@ const initialState = {
   round: 1,
   comparisons: 0,
   someoneWon: false,
+  winner: null,
+  mode: null,
 };
 
 export const counterSlice = createSlice({
@@ -50,24 +52,33 @@ export const counterSlice = createSlice({
   initialState,
   reducers: {
     takeCards1: (state, action) => {
-      state.player1.cardsInHand.push(
-        ...state.player1.orderedCards.splice(0, action.payload)
-      );
+      if (action.payload === 3 && !state.player1.cardsInHand.length) {
+        state.player1.cardsInHand.push(
+          ...state.player1.orderedCards.splice(0, action.payload)
+        );
+      }
     },
     takeCards2: (state, action) => {
-      state.player2.cardsInHand.push(
-        ...state.player2.orderedCards.splice(0, action.payload)
-      );
+      if (action.payload === 3 && !state.player2.cardsInHand.length) {
+        state.player2.cardsInHand.push(
+          ...state.player2.orderedCards.splice(0, action.payload)
+        );
+      }
     },
     selectCard1: (state, action) => {
-      state.player1.selectedCard = state.player1.cardsInHand.find(
-        (card) => card.id === action.payload
-      );
+      console.log(state.someoneWon);
+      if (!state.someoneWon) {
+        state.player1.selectedCard = state.player1.cardsInHand.find(
+          (card) => card.id === action.payload
+        );
+      }
     },
     selectCard2: (state, action) => {
-      state.player2.selectedCard = state.player2.cardsInHand.find(
-        (card) => card.id === action.payload
-      );
+      if (!state.someoneWon) {
+        state.player2.selectedCard = state.player2.cardsInHand.find(
+          (card) => card.id === action.payload
+        );
+      }
     },
     turn: (state) => {
       if (
@@ -75,24 +86,55 @@ export const counterSlice = createSlice({
         state.player1.selectedCard.value === state.player2.selectedCard.value
       ) {
         if (state.nowTurn) {
-          // Если ход второго игрока
-          state.player2.orderedCards.push(state.player2.selectedCard); // Кладём в очередь
-          state.player2.cardsInHand = state.player2.cardsInHand.filter(
-            // Убираем из защиты
-            (card) => card.id !== state.player2.selectedCard.id
-          );
-          state.player2.cardsInHand.push(
-            ...state.player2.orderedCards.splice(0, 1)
-          ); // Ставим карту в защиту
+          if (
+            state.player2.orderedCards.find(
+              (card) => card.id === state.player2.selectedCard
+            )
+          ) {
+            // Если в колод
+            // Если ход второго игрока
+            state.player2.orderedCards.push(state.player2.selectedCard); // Кладём в очередь
+            state.player2.cardsInHand = state.player2.cardsInHand.filter(
+              // Убираем из защиты
+              (card) => card.id !== state.player2.selectedCard.id
+            );
+            state.player2.cardsInHand.push(
+              ...state.player2.orderedCards.splice(0, 1)
+            ); // Ставим карту в защиту
+          } else {
+            state.player1.orderedCards.push(state.player2.selectedCard);
+            state.player2.cardsInHand = state.player2.cardsInHand.filter(
+              // Убираем из защиты
+              (card) => card.id !== state.player2.selectedCard.id
+            );
+            state.player2.cardsInHand.push(
+              ...state.player2.orderedCards.splice(0, 1)
+            ); // Ставим карту в защиту
+          }
         } else {
-          state.player1.orderedCards.push(state.player1.selectedCard); // Кладём в очередь
-          state.player1.cardsInHand = state.player1.cardsInHand.filter(
-            // Убираем из защиты
-            (card) => card.id !== state.player1.selectedCard.id
-          );
-          state.player1.cardsInHand.push(
-            ...state.player1.orderedCards.splice(0, 1)
-          ); // Ставим карту в защиту
+          if (
+            state.player2.orderedCards.find(
+              (card) => card.id === state.player2.selectedCard
+            )
+          ) {
+            state.player1.orderedCards.push(state.player1.selectedCard); // Кладём в очередь
+            state.player1.cardsInHand = state.player1.cardsInHand.filter(
+              // Убираем из защиты
+              (card) => card.id !== state.player1.selectedCard.id
+            );
+            state.player1.cardsInHand.push(
+              ...state.player1.orderedCards.splice(0, 1)
+            ); // Ставим карту в защиту
+          } else {
+            state.player2.orderedCards.push(state.player1.selectedCard); // Кладём в очередь
+            state.player1.cardsInHand = state.player1.cardsInHand.filter(
+              // Убираем из защиты
+              (card) => card.id !== state.player1.selectedCard.id
+            );
+            state.player1.cardsInHand.push(
+              ...state.player1.orderedCards.splice(0, 1)
+            ); // Ставим карту в защиту
+          }
         }
       } else if (
         // Если у первого игрока 4, а  у второго 0
@@ -183,6 +225,12 @@ export const counterSlice = createSlice({
     },
     determineWinner: (state) => {
       state.someoneWon = true;
+      state.winner =
+        (!state.player1.cardsInHand.length &&
+          !state.player1.orderedCards.length) ||
+        !state.player1.lives
+          ? 2
+          : 1;
     },
     resetStreak: (state) => {
       state.player1.streak = 0;
@@ -193,6 +241,9 @@ export const counterSlice = createSlice({
     },
     removeLive2: (state) => {
       state.player2.lives = state.player2.lives - 1;
+    },
+    setMode: (state, action) => {
+      state.mode = action.payload;
     },
   },
 });
@@ -210,6 +261,7 @@ export const {
   resetStreak,
   removeLive1,
   removeLive2,
+  setMode,
 } = counterSlice.actions;
 /* amount cards each value */
 export const selectAmountCardsPlayer1 = (state) =>
@@ -238,4 +290,6 @@ export const selectLives2 = (state) => state.game.player2.lives;
 export const selectSomeoneWon = (state) => state.game.someoneWon;
 export const selectStreak1 = (state) => state.game.player1.streak;
 export const selectStreak2 = (state) => state.game.player2.streak;
+export const selectWinner = (state) => state.game.winner;
+export const selectMode = (state) => state.game.mode;
 export default counterSlice.reducer;

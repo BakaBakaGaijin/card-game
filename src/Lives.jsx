@@ -1,14 +1,17 @@
+/* VENDOR */
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+
+/* APPLICATION */
 import "./Lives.css";
 import Add from "./img/icons/add.svg";
 import Favorite from "./img/icons/favorite.svg";
 import Remove from "./img/icons/remove.svg";
-import { useDispatch } from "react-redux";
 import { setLivesAll } from "./features/game/gameSlice";
 
 export const Lives = ({ handleLives }) => {
-  const [lives, setLives] = useState(3);
-  const dispatch = useDispatch();
+  const [lives, setLives] = useState(3),
+    dispatch = useDispatch();
 
   return (
     <div className="page-lives">

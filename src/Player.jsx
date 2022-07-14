@@ -1,12 +1,11 @@
 /* VENDOR */
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 /* APPLICATION */
 import "./Player.css";
-import Favorite from "./img/icons/favorite.svg";
 import Close from "./img/icons/close.svg";
 import { Card } from "./Card";
-//import { selectCard1, selectCard2 } from "./features/game/gameSlice";
+import { selectMode } from "./features/game/gameSlice";
 
 export const Player = ({
   player,
@@ -19,23 +18,25 @@ export const Player = ({
   selectCard2,
   amountCards,
 }) => {
-  const dispatch = useDispatch();
-
-  const selectCardHandler = (id) => {
-    if (player === 1) {
-      if (!nowTurn) {
-        dispatch(selectCard1(id));
-      } else if (selectedCard2) {
-        dispatch(selectCard1(id));
+  const dispatch = useDispatch(),
+    mode = useSelector(selectMode),
+    selectCardHandler = (id) => {
+      if (player === 1) {
+        if (!nowTurn) {
+          dispatch(selectCard1(id));
+        } else if (selectedCard2) {
+          dispatch(selectCard1(id));
+        }
+      } else {
+        // Карты второго игрока или бота
+        if (nowTurn && mode !== "ai") {
+          // Ходит второй игрок или бот
+          dispatch(selectCard2(id));
+        } else if (selectedCard1) {
+          dispatch(selectCard2(id));
+        }
       }
-    } else {
-      if (nowTurn) {
-        dispatch(selectCard2(id));
-      } else if (selectedCard1) {
-        dispatch(selectCard2(id));
-      }
-    }
-  };
+    };
 
   return (
     <div className="player">
@@ -44,11 +45,11 @@ export const Player = ({
           className={player === 1 ? "container" : "container container-reverse"}
         >
           <h2 className={`player-header__title player-header__title${player}`}>
-            {player} игрок
+            {mode === "ai" && player === 2 ? "бот" : `${player} игрок`}
           </h2>
           <div className="player-header-lives">
             {lives}
-            <img src={Close} className="player-header-lives__mul" />
+            <img src={Close} className="player-header-lives__mul" alt="" />
             <svg
               xmlns="http://www.w3.org/2000/svg"
               height="48"

@@ -1,13 +1,7 @@
-import logo from "./logo.svg";
 import "./App.css";
-import { Card } from "./Card";
-import { nanoid } from "nanoid";
-import { useState } from "react";
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  selectAmountCardsPlayer1,
-  selectAmountCardsPlayer2,
   selectOrderedCardsPlayer1,
   selectOrderedCardsPlayer2,
   selectCardsInHandsPlayer1,
@@ -21,7 +15,6 @@ import {
   selectedTurn,
   changeTurn,
   turn,
-  selectRound,
   selectComparisons,
   selectLives1,
   selectLives2,
@@ -32,48 +25,52 @@ import {
   resetStreak,
   removeLive1,
   removeLive2,
+  selectWinner,
+  selectMode,
 } from "./features/game/gameSlice";
 
-import { Lives } from "./Lives";
-import Favorite from "./img/icons/favorite.svg";
-import Close from "./img/icons/close.svg";
 import { Player } from "./Player";
 
+function findZero(element, index, array) {
+  return element.value === 0;
+}
+
+function findFour(element, index, array) {
+  return element.value === 4;
+}
+
 export const Game = () => {
-  const streak1 = useSelector(selectStreak1);
-  const streak2 = useSelector(selectStreak2);
-  const someoneWon = useSelector(selectSomeoneWon);
-  const [isLives, setIsLives] = useState(false);
-  const comparisons = useSelector(selectComparisons);
-  const round = useSelector(selectRound);
-  let nowTurn = useSelector(selectedTurn);
-  let selectedCard1 = useSelector(selectedCardPlayer1);
-  let selectedCard2 = useSelector(selectedCardPlayer2);
-  const amountCards1 = useSelector(selectAmountCardsPlayer1);
-  const amountCards2 = useSelector(selectAmountCardsPlayer2);
-  const orderedCards1 = useSelector(selectOrderedCardsPlayer1);
-  const orderedCards2 = useSelector(selectOrderedCardsPlayer2);
-  const dispatch = useDispatch();
+  const streak1 = useSelector(selectStreak1),
+    streak2 = useSelector(selectStreak2),
+    someoneWon = useSelector(selectSomeoneWon),
+    comparisons = useSelector(selectComparisons),
+    nowTurn = useSelector(selectedTurn),
+    selectedCard1 = useSelector(selectedCardPlayer1),
+    selectedCard2 = useSelector(selectedCardPlayer2),
+    orderedCards1 = useSelector(selectOrderedCardsPlayer1),
+    orderedCards2 = useSelector(selectOrderedCardsPlayer2),
+    cardsInHandsPlayer1 = useSelector(selectCardsInHandsPlayer1),
+    cardsInHandsPlayer2 = useSelector(selectCardsInHandsPlayer2),
+    lives1 = useSelector(selectLives1),
+    lives2 = useSelector(selectLives2),
+    winner = useSelector(selectWinner),
+    mode = useSelector(selectMode),
+    dispatch = useDispatch();
 
-  const [currentCardFirstPlayer, setCurrentCardFirstPlayer] = useState();
-  const [currentCardSecondPlayer, setCurrentCardSecondPlayer] = useState();
-
+  // Берём карты в защиту один раз в начале игры
   useEffect(() => {
-    console.log("Вызывается только один раз");
     dispatch(takeCards1(3));
     dispatch(takeCards2(3));
   }, []);
 
+  // Засчитать ход, когда выбрано 2 карты
   useEffect(() => {
-    console.log("Зашли сюда");
     if (selectedCard1 && selectedCard2) {
       dispatch(turn());
     }
   }, [selectedCard1, selectedCard2]);
 
-  const cardsInHandsPlayer1 = useSelector(selectCardsInHandsPlayer1);
-  const cardsInHandsPlayer2 = useSelector(selectCardsInHandsPlayer2);
-
+  // Берём карты в защиту каждый раз как они там закончились
   useEffect(() => {
     if (
       !cardsInHandsPlayer1.length &&
@@ -93,9 +90,7 @@ export const Game = () => {
     }
   }, [cardsInHandsPlayer1, cardsInHandsPlayer2]);
 
-  const lives1 = useSelector(selectLives1);
-  const lives2 = useSelector(selectLives2);
-  // ЭТОТ ЮЗЭФФЕКТ
+  // Проверяем, выиграл ли кто
   useEffect(() => {
     if (
       (!orderedCards1.length && cardsInHandsPlayer1.length) ||
@@ -106,6 +101,58 @@ export const Game = () => {
       dispatch(determineWinner());
     }
   }, [orderedCards1, orderedCards2, cardsInHandsPlayer1, cardsInHandsPlayer2]);
+
+  // Ход бота
+  useEffect(() => {
+    if (nowTurn && orderedCards1.length && mode !== "friend" && !someoneWon) {
+      // Если у бота есть 0
+      if (cardsInHandsPlayer2.findIndex(findZero) !== -1) {
+        const aiZeroIndex = cardsInHandsPlayer2.findIndex(findZero);
+        console.log("У меня есть 0");
+        dispatch(selectCard2(cardsInHandsPlayer2[aiZeroIndex].id));
+
+        // А у человека 4
+        if (cardsInHandsPlayer1.findIndex(findFour) !== -1) {
+          const personFourIndex = cardsInHandsPlayer1.findIndex(findFour);
+          console.log("У меня есть 0, а у человека 4. Время действовать!");
+          setTimeout(() => {
+            dispatch(selectCard2(cardsInHandsPlayer2[aiZeroIndex].id));
+            setTimeout(() => {
+              dispatch(selectCard1(cardsInHandsPlayer1[personFourIndex].id));
+            }, 2000);
+          }, 2000);
+        } else if (cardsInHandsPlayer1.findIndex(findZero) !== -1) {
+          // И у человека 0
+          const personZeroIndex = cardsInHandsPlayer1.findIndex(findZero);
+          console.log("У меня есть 0, и у человека 0. Время действовать!");
+
+          setTimeout(() => {
+            dispatch(selectCard2(cardsInHandsPlayer2[aiZeroIndex].id));
+            setTimeout(() => {
+              dispatch(selectCard1(cardsInHandsPlayer1[personZeroIndex].id));
+            }, 2000);
+          }, 2000);
+        } else {
+          setTimeout(() => {
+            dispatch(selectCard2(cardsInHandsPlayer2[aiZeroIndex].id));
+            setTimeout(() => {
+              dispatch(selectCard1(cardsInHandsPlayer1[0].id));
+            }, 2000);
+          }, 2000);
+        }
+      } else {
+        console.log("cards in hands: ", cardsInHandsPlayer2[0]?.id);
+        setTimeout(() => {
+          dispatch(selectCard2(cardsInHandsPlayer2[0]?.id));
+          setTimeout(() => {
+            dispatch(selectCard1(cardsInHandsPlayer1[0]?.id));
+          }, 2000);
+        }, 2000);
+      }
+      console.log("my turn, human");
+    }
+  }, [nowTurn, dispatch, cardsInHandsPlayer1, cardsInHandsPlayer2]);
+
   return (
     <div className={`game game${nowTurn ? 2 : 1}`}>
       <Player
@@ -120,7 +167,13 @@ export const Game = () => {
         amountCards={orderedCards1.length}
       />
       <h1 className={`nowTurn nowTurn${nowTurn ? 2 : 1}`}>
-        {!nowTurn ? "Ходит первый игрок" : "Ходит второй игрок"}
+        {mode === "friend"
+          ? !nowTurn
+            ? "Ходит первый игрок"
+            : "Ходит второй игрок"
+          : !nowTurn
+          ? "Ходит игрок"
+          : "Ходит бот"}
       </h1>
       <Player
         player={2}
@@ -135,7 +188,16 @@ export const Game = () => {
       />
       {someoneWon && (
         <div className="modal-background">
-          <div className="modal"></div>
+          <div className="modal">
+            <h3>
+              Поздравлям! Победил{" "}
+              <span className={`modal-winner modal-winner${winner}`}>
+                {mode === "friend" || (mode === "ai" && winner === 1)
+                  ? `${winner} игрок`
+                  : "бот"}
+              </span>
+            </h3>
+          </div>
         </div>
       )}
     </div>

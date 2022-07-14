@@ -1,15 +1,17 @@
+/* VENDOR */
 import { nanoid } from "nanoid";
 import { useSelector } from "react-redux";
+
+/* APPLICATION */
 import {
   selectedCardPlayer1,
   selectedCardPlayer2,
-  selectedTurn,
 } from "./features/game/gameSlice";
 
 export const Card = ({ card, onClick, player }) => {
-  let nowTurn = useSelector(selectedTurn);
-  let selectedCard1 = useSelector(selectedCardPlayer1);
-  let selectedCard2 = useSelector(selectedCardPlayer2);
+  const selectedCard1 = useSelector(selectedCardPlayer1),
+    selectedCard2 = useSelector(selectedCardPlayer2);
+
   return (
     <div
       className={
