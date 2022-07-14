@@ -1,0 +1,49 @@
+.mode {
+  box-sizing: border-box;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mode-container {
+  padding: 20px;
+  background-color: #fff;
+}
+
+.mode-title {
+  margin-bottom: 20px;
+}
+
+.mode-btns {
+  display: flex;
+  justify-content: space-around;
+}
+
+.mode-btns__btn {
+  box-sizing: border-box;
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.mode-btns__btn1 {
+  border: 2px solid deeppink;
+  transition: all 0.3s;
+}
+
+.mode-btns__btn1:hover {
+  background-color: deeppink;
+  color: #fff;
+}
+
+.mode-btns__btn2 {
+  border: 2px solid deepskyblue;
+}
+
+.mode-btns__btn2:hover {
+  transition: 0.3s;
+  background-color: deepskyblue;
+  color: #fff;
+}
