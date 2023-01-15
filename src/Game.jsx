@@ -27,15 +27,16 @@ import {
   removeLive2,
   selectWinner,
   selectMode,
+  restart,
 } from "./features/game/gameSlice";
 
 import { Player } from "./Player";
 
-function findZero(element, index, array) {
+function findZero(element) {
   return element.value === 0;
 }
 
-function findFour(element, index, array) {
+function findFour(element) {
   return element.value === 4;
 }
 
@@ -61,14 +62,14 @@ export const Game = () => {
   useEffect(() => {
     dispatch(takeCards1(3));
     dispatch(takeCards2(3));
-  }, []);
+  }, [dispatch]);
 
   // Засчитать ход, когда выбрано 2 карты
   useEffect(() => {
     if (selectedCard1 && selectedCard2) {
       dispatch(turn());
     }
-  }, [selectedCard1, selectedCard2]);
+  }, [selectedCard1, selectedCard2, dispatch]);
 
   // Берём карты в защиту каждый раз как они там закончились
   useEffect(() => {
@@ -88,7 +89,14 @@ export const Game = () => {
       }
       dispatch(resetStreak());
     }
-  }, [cardsInHandsPlayer1, cardsInHandsPlayer2]);
+  }, [
+    cardsInHandsPlayer1,
+    cardsInHandsPlayer2,
+    dispatch,
+    comparisons,
+    streak1,
+    streak2,
+  ]);
 
   // Проверяем, выиграл ли кто
   useEffect(() => {
@@ -100,7 +108,15 @@ export const Game = () => {
     ) {
       dispatch(determineWinner());
     }
-  }, [orderedCards1, orderedCards2, cardsInHandsPlayer1, cardsInHandsPlayer2]);
+  }, [
+    orderedCards1,
+    orderedCards2,
+    cardsInHandsPlayer1,
+    cardsInHandsPlayer2,
+    dispatch,
+    lives1,
+    lives2,
+  ]);
 
   // Ход бота
   useEffect(() => {
@@ -151,7 +167,15 @@ export const Game = () => {
       }
       console.log("my turn, human");
     }
-  }, [nowTurn, dispatch, cardsInHandsPlayer1, cardsInHandsPlayer2]);
+  }, [
+    nowTurn,
+    dispatch,
+    cardsInHandsPlayer1,
+    cardsInHandsPlayer2,
+    mode,
+    orderedCards1.length,
+    someoneWon,
+  ]);
 
   return (
     <div className={`game game${nowTurn ? 2 : 1}`}>
@@ -197,6 +221,12 @@ export const Game = () => {
                   : "бот"}
               </span>
             </h3>
+            <button
+              className="modal-winner__btn"
+              onClick={() => dispatch(restart())}
+            >
+              Сыграть ещё раз
+            </button>
           </div>
         </div>
       )}
