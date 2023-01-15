@@ -5,15 +5,13 @@ import { useDispatch } from "react-redux";
 import "./Mode.css";
 import { setMode } from "./features/game/gameSlice";
 
-export const Mode = ({ handleMode }) => {
+export const Mode = () => {
   const dispatch = useDispatch(),
     withFriendHandler = () => {
       dispatch(setMode("friend"));
-      handleMode();
     },
     withAIHandler = () => {
       dispatch(setMode("ai"));
-      handleMode();
     };
 
   return (

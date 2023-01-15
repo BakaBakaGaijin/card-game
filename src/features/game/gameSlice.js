@@ -45,6 +45,7 @@ const initialState = {
   someoneWon: false,
   winner: null,
   mode: null,
+  lives: null,
 };
 
 export const counterSlice = createSlice({
@@ -220,6 +221,7 @@ export const counterSlice = createSlice({
       state.nowTurn = !state.nowTurn;
     },
     setLivesAll: (state, action) => {
+      state.lives = action.payload;
       state.player1.lives = action.payload;
       state.player2.lives = action.payload;
     },
@@ -245,6 +247,32 @@ export const counterSlice = createSlice({
     setMode: (state, action) => {
       state.mode = action.payload;
     },
+    restart: (state) => {
+      state.mode = null;
+      state.lives = null;
+      state.player1 = {
+        amountCards: { ...[4, 4, 4, 4, 4] },
+        orderedCards: fillCards(),
+        cardsInHand: [],
+        selectedCard: null,
+        lives: 3,
+        streak: 0,
+      };
+      state.player2 = {
+        amountCards: { ...[4, 4, 4, 4, 4] },
+        orderedCards: fillCards(),
+        cardsInHand: [],
+        selectedCard: null,
+        lives: 3,
+        streak: 0,
+      };
+
+      state.nowTurn = myRandom(1);
+      state.round = 1;
+      state.comparisons = 0;
+      state.someoneWon = false;
+      state.winner = null;
+    },
   },
 });
 
@@ -262,6 +290,7 @@ export const {
   removeLive1,
   removeLive2,
   setMode,
+  restart,
 } = counterSlice.actions;
 /* amount cards each value */
 export const selectAmountCardsPlayer1 = (state) =>
@@ -292,4 +321,5 @@ export const selectStreak1 = (state) => state.game.player1.streak;
 export const selectStreak2 = (state) => state.game.player2.streak;
 export const selectWinner = (state) => state.game.winner;
 export const selectMode = (state) => state.game.mode;
+export const selectLives = (state) => state.game.lives;
 export default counterSlice.reducer;

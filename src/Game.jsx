@@ -27,15 +27,16 @@ import {
   removeLive2,
   selectWinner,
   selectMode,
+  restart,
 } from "./features/game/gameSlice";
 
 import { Player } from "./Player";
 
-function findZero(element, index, array) {
+function findZero(element) {
   return element.value === 0;
 }
 
-function findFour(element, index, array) {
+function findFour(element) {
   return element.value === 4;
 }
 
@@ -197,6 +198,12 @@ export const Game = () => {
                   : "бот"}
               </span>
             </h3>
+            <button
+              className="modal-winner__btn"
+              onClick={() => dispatch(restart())}
+            >
+              Сыграть ещё раз
+            </button>
           </div>
         </div>
       )}

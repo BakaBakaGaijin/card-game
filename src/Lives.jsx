@@ -9,7 +9,7 @@ import Favorite from "./img/icons/favorite.svg";
 import Remove from "./img/icons/remove.svg";
 import { setLivesAll } from "./features/game/gameSlice";
 
-export const Lives = ({ handleLives }) => {
+export const Lives = () => {
   const [lives, setLives] = useState(3),
     dispatch = useDispatch();
 
@@ -41,7 +41,6 @@ export const Lives = ({ handleLives }) => {
         className="next"
         onClick={() => {
           dispatch(setLivesAll(lives));
-          handleLives();
         }}
       >
         Продолжить
